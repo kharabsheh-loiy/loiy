@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Merchant KB</title>
+  <meta name="description" content="Merchant KB — refined motion & layout" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/wicg-inert@3.1.1/dist/inert.min.js"></script>
+
+  <style>
+    :root{
+      --bg-fallback: #0e1518;
+      --bg: linear-gradient(180deg, #0b2230 0%, #0e1518 60%, #0b0b0b 100%);
+      --panel: #121518;
+      --muted: #9aa6b2;
+      --text: #e7eef6;
+      --cap-1: #f0e6d8;
+      --cap-2: #bfa48a;
+      --logo-bg: linear-gradient(135deg, var(--cap-1), var(--cap-2));
+      --logo-text: #000000;
+      --icon-border: rgba(255,255,255,0.06);
+      --shadow-strong: 0 20px 48px rgba(0,0,0,0.5);
+      --motion-duration: 0.26s;
+      --motion-duration-slow: 0.42s;
+      --motion-ease: cubic-bezier(.18,.88,.34,1);
+      --drawer-width: 720px;
+      --gap: 20px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Rubik",Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      background: var(--bg-fallback);
+      background-image: var(--bg);
+      color:var(--text);
+      font-size:14px;
+      line-height:1.5;
+      direction:ltr;
+      padding:22px;
+      overflow-x:hidden;
+    }
+
+    .content-wrap{ max-width:1200px; margin:0 auto; position:relative; z-index:93; }
+
+    .site-title {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      z-index:210;
+      font-size:20px;
+      font-weight:800;
+      color:var(--text);
+      padding: 6px 10px;
+      border-radius:8px;
+      background: transparent;
+    }
+    .site-title svg{ width:24px; height:24px; fill:var(--logo-text); display:block; }
+    .site-title .site-name{ color:var(--text); font-weight:800; font-size:20px; line-height:1; }
+
+    .main-icons {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      display:flex;
+      gap:44px;
+      align-items:center;
+      justify-content:center;
+      z-index:94;
+      pointer-events:auto;
+      perspective: 1000px;
+    }
+
+    .main-item { display:flex; flex-direction:column; align-items:center; gap:10px; }
+
+    .main-icon {
+      width: 180px;
+      height: 180px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: var(--logo-bg);
+      color: var(--logo-text);
+      font-weight:900;
+      font-size:28px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.52);
+      border: 1px solid rgba(255,255,255,0.02);
+      cursor:pointer;
+      transform: translateZ(0);
+      transition:
+        transform var(--motion-duration) var(--motion-ease),
+        opacity calc(var(--motion-duration) * 0.9) var(--motion-ease),
+        box-shadow calc(var(--motion-duration) * 0.9) var(--motion-ease);
+      will-change: transform, opacity;
+    }
+    .main-icon[disabled] { opacity: 0.36; cursor: default; }
+    .main-icon:focus { outline: 3px solid rgba(191,164,138,0.12); outline-offset:6px; }
+    .main-label { color: var(--text); font-weight:700; font-size:15px; text-align:center; user-select:none; pointer-events:none; }
+
+    .main-icon:hover:not([disabled]) {
+      transform: translateY(-10px) scale(1.03) rotateX(2deg);
+      box-shadow: 0 40px 88px rgba(0,0,0,0.58);
+    }
+
+    .main-icons.collapsing .main-icon {
+      opacity:0;
+      transform: translateY(40px) scale(.94);
+      transition-duration: calc(var(--motion-duration) * 0.9);
+    }
+
+    .sub-panel {
+      position: fixed;
+      left: 50%;
+      top: 42%;
+      transform: translate(-50%,-50%);
+      display:grid;
+      grid-auto-rows: min-content;
+      gap:18px;
+      align-items:center;
+      justify-items:center;
+      z-index:96;
+      pointer-events:auto;
+      background: transparent;
+      padding: 0;
+      opacity:0;
+      transition: opacity var(--motion-duration) var(--motion-ease), transform var(--motion-duration) var(--motion-ease);
+    }
+    .sub-panel.show {
+      opacity:1;
+      transform: translate(-50%,-50%);
+    }
+
+    .sub-item {
+      --tx: 0px;
+      --ty: 72px;
+      --s: 0.985;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      background: transparent;
+      border:0;
+      cursor:pointer;
+      padding:6px;
+      user-select:none;
+      opacity:0;
+      transform: translateX(var(--tx)) translateY(var(--ty)) scale(var(--s));
+      transition:
+        transform var(--motion-duration-slow) var(--motion-ease),
+        opacity var(--motion-duration) var(--motion-ease);
+      will-change: transform, opacity;
+    }
+
+    .sub-item .icon {
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: var(--logo-bg);
+      color: var(--logo-text);
+      font-weight:900;
+      font-size:18px;
+      box-shadow: 0 14px 36px rgba(0,0,0,0.44);
+      border:1px solid rgba(255,255,255,0.02);
+      transition: transform calc(var(--motion-duration) * 0.9) var(--motion-ease), box-shadow calc(var(--motion-duration) * 0.9) var(--motion-ease);
+    }
+    .sub-item .sub-label { color:var(--text); font-weight:700; font-size:13px; margin-top:10px; text-align:center; max-width:140px; }
+
+    .sub-item.show { --ty: 0px; --s: 1; opacity: 1; }
+
+    .sub-item:focus .icon, .sub-item:hover .icon {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 22px 48px rgba(0,0,0,0.5);
+    }
+
+    #subBackBtn {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 97;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.04);
+      color: var(--muted);
+      padding:10px 14px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      backdrop-filter: blur(6px);
+      transition: transform var(--motion-duration) var(--motion-ease), opacity var(--motion-duration) var(--motion-ease);
+      display: none;
+    }
+    #subBackBtn:active { transform: translateX(-50%) translateY(2px); }
+
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 90; opacity: 0; visibility: hidden; transition: opacity var(--motion-duration) var(--motion-ease), visibility var(--motion-duration) var(--motion-ease); pointer-events: none; }
+    .drawer-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
+
+    .detail-drawer{
+      position:fixed; top:18px; bottom:18px; right:18px; width: min(var(--drawer-width), calc(100% - 36px));
+      background-image: var(--bg);
+      background-color: rgba(11,34,48,0.98);
+      border-radius:12px; padding:18px; border:1px solid rgba(255,255,255,0.02);
+      box-shadow: 0 28px 68px rgba(0,0,0,0.5); transform:translateX(8%); transition: transform var(--motion-duration) var(--motion-ease), opacity var(--motion-duration) var(--motion-ease);
+      opacity:0; z-index:100; display:flex; flex-direction:column; overflow:auto; pointer-events:none;
+      color:var(--text);
+    }
+    .detail-drawer.open{ transform:translateX(0); opacity:1; pointer-events:auto; }
+
+    .drawer-header{ display:flex; gap:10px; align-items:center; justify-content:space-between; }
+    .drawer-title{ font-weight:900; font-size:20px; color:var(--text); margin:0; }
+    .drawer-sub{ color:var(--muted); font-size:13px; }
+    .drawer-body{ flex:1; overflow:auto; padding-top:8px; }
+    .drawer-actions{ display:flex; gap:8px; align-items:center; margin-top:10px; }
+
+    .plain-solution{ background:transparent; color:var(--text); font-size:15px; line-height:1.7; user-select:text; position:relative; padding-right:10px; }
+    .plain-solution h2{ margin:0 0 8px 0; font-size:18px; font-weight:800; color:var(--text); }
+    .plain-solution p{ margin:8px 0; color:var(--text); }
+    .plain-solution .preserve { white-space: pre-wrap; margin:8px 0; color:var(--text); }
+    .plain-solution .preserve[dir="rtl"] { text-align: right; }
+    .plain-solution .preserve[dir="ltr"] { text-align: left; }
+
+    .notice {
+      margin: 8px 0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight:600;
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+    }
+    .notice.info { border:1px solid rgba(255,255,255,0.04); }
+    .notice.error { border:1px solid rgba(255,0,0,0.25); color:#ffdddd; background: rgba(255,0,0,0.06); }
+
+    button:focus, input:focus, textarea:focus, .card:focus { outline: 3px solid rgba(191,164,138,0.12); outline-offset:3px; }
+
+    .credit{ position:fixed; left:12px; bottom:12px; color:var(--muted); font-size:12px; z-index:200; text-align:left; }
+    .credit .name{ color:var(--text); font-weight:700; display:block; margin-top:4px; }
+
+    @media (max-width:920px){
+      .sub-panel { width: calc(100% - 48px); grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:14px; top: 40%; }
+      .main-icon { width: 130px; height:130px; font-size:20px; }
+      .sub-item .icon { width:96px; height:96px; }
+      .site-title { top:12px; right:12px; font-size:16px; }
+      .drawer-title{ font-size:16px; }
+      #subBackBtn { bottom: 14px; padding:8px 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="content-wrap" aria-hidden="false">
+    <header>
+      <div class="brand">
+        <div class="site-title" aria-label="Merchant KB">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9 2c.55 0 1 .45 1 1v7.59l1.3-1.3a1 1 0 1 1 1.41 1.42L11 13.41V22a1 1 0 1 1-2 0V13.41L5.29 8.7A1 1 0 0 1 6.7 7.29L8 8.59V3c0-.55.45-1 1-1z" fill="var(--logo-text)"/>
+            <path d="M17 3h1a1 1 0 0 1 1 1v11.59l1.3-1.3a1 1 0 0 1 1.41 1.42L19.41 22 18 20.59V5h-1a1 1 0 0 1 0-2z" fill="var(--logo-text)"/>
+          </svg>
+          <span class="site-name">Merchant KB</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" role="region" aria-label="Main categories"></section>
+      <section id="panels" class="panel" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div class="main-icons" role="tablist" aria-label="Primary categories" aria-hidden="false">
+    <div class="main-item">
+      <button type="button" role="tab" class="main-icon" id="main-non" data-cat="non" aria-pressed="false" aria-expanded="false" aria-selected="false" aria-controls="subPanel" aria-label="Non-order" title="Non-order">
+        <span aria-hidden="true">KB</span>
+      </button>
+      <div class="main-label">Non-order</div>
+    </div>
+
+    <div class="main-item">
+      <button type="button" role="tab" class="main-icon" id="main-order" data-cat="order" aria-pressed="false" aria-expanded="false" aria-selected="false" aria-controls="subPanel" aria-label="Orders" title="Orders">
+        <span aria-hidden="true">KB</span>
+      </button>
+      <div class="main-label">Order</div>
+    </div>
+
+    <div class="main-item">
+      <button type="button" role="tab" class="main-icon" id="main-scripts" data-cat="scripts" aria-pressed="false" aria-expanded="false" aria-selected="false" aria-controls="subPanel" aria-label="Scripts" title="Scripts">
+        <span aria-hidden="true">KB</span>
+      </button>
+      <div class="main-label">Scripts</div>
+    </div>
+  </div>
+
+  <div id="drawerOverlay" class="drawer-overlay" aria-hidden="true"></div>
+
+  <button id="subBackBtn" type="button" aria-hidden="true">Back</button>
+
+  <aside id="detailDrawer" class="detail-drawer" role="dialog" aria-modal="false" aria-labelledby="drawerTitle" aria-describedby="drawerBody" aria-hidden="true">
+    <div class="drawer-header">
+      <div>
+        <h3 id="drawerTitle" class="drawer-title">Title</h3>
+        <div id="drawerSub" class="drawer-sub">Category — details</div>
+      </div>
+      <button id="closeDrawer" type="button" class="sub-back" aria-label="Close" aria-controls="detailDrawer">Back</button>
+    </div>
+
+    <div id="drawerBody" class="drawer-body" tabindex="0" aria-live="polite"></div>
+    <div id="drawerActions" class="drawer-actions"></div>
+  </aside>
+
+  <div class="credit" aria-hidden="true">
+    Made by
+    <span class="name">Loai Alkharabsheh</span>
+  </div>
+
+  <script>
+    const nonOrderItems = [
+      { id: 1, label: "Account registration" },
+      { id: 2, label: "Account deletion" },
+      { id: 3, label: "Qualification materials for restaurant onboarding" },
+      { id: 4, label: "Expedite onboarding review" },
+      { id: 5, label: "Abnormal login" },
+      { id: 6, label: "Restaurant information modification" },
+      { id: 7, label: "Menu modification" },
+      { id: 8, label: "Marketing campaign inquiry" },
+      { id: 9, label: "Material purchase" },
+      { id: 10, label: "Request bills" },
+      { id: 11, label: "Settlement/withdrawal issues" },
+      { id: 12, label: "Billing issues" },
+      { id: 13, label: "Link/verify bank cards" },
+      { id: 14, label: "Inquiry about system operations (PC/APP/POS)" },
+      { id: 15, label: "Hardware setting (POS/Printer)" },
+      { id: 16, label: "BD non-compliant behaviours" },
+      { id: 17, label: "Courier's attitude issues" }
+    ];
+    const orderItems = [
+      { id: 1, label: "Order cancellation inquiry" },
+      { id: 2, label: "Item sold out/out of stock" },
+      { id: 3, label: "The restaurant is closed" },
+      { id: 4, label: "The restaurant is busy and can't accept orders" },
+      { id: 5, label: "No couriers accept the order" },
+      { id: 6, label: "Courier pick-up is too slow" },
+      { id: 7, label: "Food too large/heavy" },
+      { id: 8, label: "Packaging damaged during delivery" },
+      { id: 9, label: "Inquiry about automatic refunds by Keeta" },
+      { id: 10, label: "Inquiry about order refund result" },
+      { id: 11, label: "Inquiry about order refund status" },
+      { id: 12, label: "Unsatisfied with the policies/result of the dispute" },
+      { id: 13, label: "Issues regarding order acceptance system – order not found" },
+      { id: 14, label: "Picked up the wrong order" }
+    ];
+
+    const approvedSteps = {
+      non: {
+        1: { title: "Account registration", steps: ["Verify the user's identity with required official documents according to onboarding policy.","Confirm contact details (phone/email) and ownership.","If documents are missing, notify the merchant with exact missing items and a deadline.","Complete registration and send automated confirmation using template REG-OK-01."] },
+        2: { title: "Account deletion", steps: ["Confirm deletion request originates from the verified account owner.","Check for outstanding settlements; if present, escalate to Finance with a reference.","Apply data retention and deletion rules, and record a deletion token.","Notify the merchant using standard deletion confirmation template."] },
+         3: {
+          title: "Qualification materials for restaurant onboarding",
+          contentBlocks: [
+            { bold: true, dir: "ltr", text: "-BD non-compliant behaviours" },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- خطوات الحل" },
+            { text: "" },
+            { dir: "rtl", text: "1- افهم المشكلة من التاجر بشكل صحيح واطلب دليل اذا توفر\n2- تصعيد المشكلة للقسم المختص" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "KB - Script" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EN" },
+            { dir: "ltr", text: "I`m sorry for the bad experience. Your feedback have been recorded and we attach great importance to it.We will verify it as soon as possible, and if it is true, we will punish the business manager accordingly. In order to avoid such problems from happening again, we will also increase the monitoring of business managers to improve service quality, and hope that you will continue to supervise.thank you for your support and understanding." },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- AR" },
+            { dir: "rtl", text: "أعتذر عن التجربة السيئة اللي مرّيت فيها. ملاحظاتك تم تسجيلها ونحن نوليها أهمية كبيرة. راح نتحقق منها بأسرع وقت، وإذا كانت صحيحة، راح يتم معاقبة مدير الأعمال حسب الإجراءات المتبعة.\nعشان نتجنب حدوث مثل هالمشاكل مرة ثانية، رح نزود المراقبة على مدراء الأعمال لتحسين جودة الخدمة، ونأمل إنك تواصل متابعة الموضوع معنا.\nشكراً لدعمك وتفهمك." },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EscalationTemplate" },
+            { text: "" },
+            { dir: "ltr", text: "Feedback time:\nCase ID:\nStore ID:\nStore Name:\nStore Address:\nStore Contact Information:966-\nThe brand manager:\nFull Description :" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- More Scripts" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EN" },
+            { dir: "ltr", text: "First of all, I’m really sorry for the experience you’ve had, and I completely understand the frustration you must be feeling. Your feedback has been received, and we take it very seriously.\nWe are currently looking into the issue as quickly as possible, and if it's confirmed, we will take the necessary steps with the business manager following our procedures.\nTo prevent similar issues in the future, we’ll be increasing the monitoring of business managers and working on improving our service overall.\nI really appreciate your patience and cooperation with us. If you need anything else or want to follow up, I’m always here to help.\nThanks again for your understanding and continued support!" },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- AR" },
+            { dir: "rtl", text: "أول شي، أنا متأسف جداً عالتجربة اللي مرّيت فيها، وأقدر تماماً الإحباط اللي حسيت فيه. ملاحظتك وصلت إلينا، وحطيناها ضمن أولوياتنا.\nحاليّاً، عم نتحقق من الموضوع بأسرع وقت، وإذا كان الكلام صحيح، رح نتخذ الإجراءات اللازمة مع مدير الأعمال حسب القوانين اللي عندنا.\nولحتى نتجنب تكرار هالمشاكل مستقبلاً، رح نزيد المراقبة على مدراء الأعمال ونشتغل على تحسين الخدمة بشكل عام.\nأنا متفهم تماماً وكتير نقدر صبرك وتعاونك معنا. إذا في شي تاني حابب تستفسر عنه أو تتابع الموضوع، أنا هون دائماً لأساعدك.\nشكراً كتير لتفهمك ودعمك المستمر!" }
+          ]
+        
+      },
+        16: {
+          title: "BD non-compliant behaviours",
+          contentBlocks: [
+            { bold: true, dir: "ltr", text: "-BD non-compliant behaviours" },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- خطوات الحل" },
+            { text: "" },
+            { dir: "rtl", text: "1- افهم المشكلة من التاجر بشكل صحيح واطلب دليل اذا توفر\n2- تصعيد المشكلة للقسم المختص" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "KB - Script" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EN" },
+            { dir: "ltr", text: "I`m sorry for the bad experience. Your feedback have been recorded and we attach great importance to it.We will verify it as soon as possible, and if it is true, we will punish the business manager accordingly. In order to avoid such problems from happening again, we will also increase the monitoring of business managers to improve service quality, and hope that you will continue to supervise.thank you for your support and understanding." },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- AR" },
+            { dir: "rtl", text: "أعتذر عن التجربة السيئة اللي مرّيت فيها. ملاحظاتك تم تسجيلها ونحن نوليها أهمية كبيرة. راح نتحقق منها بأسرع وقت، وإذا كانت صحيحة، راح يتم معاقبة مدير الأعمال حسب الإجراءات المتبعة.\nعشان نتجنب حدوث مثل هالمشاكل مرة ثانية، رح نزود المراقبة على مدراء الأعمال لتحسين جودة الخدمة، ونأمل إنك تواصل متابعة الموضوع معنا.\nشكراً لدعمك وتفهمك." },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EscalationTemplate" },
+            { text: "" },
+            { dir: "ltr", text: "Feedback time:\nCase ID:\nStore ID:\nStore Name:\nStore Address:\nStore Contact Information:966-\nThe brand manager:\nFull Description :" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- More Scripts" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EN" },
+            { dir: "ltr", text: "First of all, I’m really sorry for the experience you’ve had, and I completely understand the frustration you must be feeling. Your feedback has been received, and we take it very seriously.\nWe are currently looking into the issue as quickly as possible, and if it's confirmed, we will take the necessary steps with the business manager following our procedures.\nTo prevent similar issues in the future, we’ll be increasing the monitoring of business managers and working on improving our service overall.\nI really appreciate your patience and cooperation with us. If you need anything else or want to follow up, I’m always here to help.\nThanks again for your understanding and continued support!" },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- AR" },
+            { dir: "rtl", text: "أول شي، أنا متأسف جداً عالتجربة اللي مرّيت فيها، وأقدر تماماً الإحباط اللي حسيت فيه. ملاحظتك وصلت إلينا، وحطيناها ضمن أولوياتنا.\nحاليّاً، عم نتحقق من الموضوع بأسرع وقت، وإذا كان الكلام صحيح، رح نتخذ الإجراءات اللازمة مع مدير الأعمال حسب القوانين اللي عندنا.\nولحتى نتجنب تكرار هالمشاكل مستقبلاً، رح نزيد المراقبة على مدراء الأعمال ونشتغل على تحسين الخدمة بشكل عام.\nأنا متفهم تماماً وكتير نقدر صبرك وتعاونك معنا. إذا في شي تاني حابب تستفسر عنه أو تتابع الموضوع، أنا هون دائماً لأساعدك.\nشكراً كتير لتفهمك ودعمك المستمر!" }
+          ]
+        }
+      },
+      order: {
+        1: { title: "Order cancellation inquiry", steps: ["Check the order status in the Order Management System (OMS).","If cancellation requested before preparation, issue full refund and inform the customer.","If the restaurant already prepared the order, follow compensation policy COMP-02 and advise merchant.","Log the action with a cancellation reference and close the inquiry."] },
+        2: { title: "Item sold out / out of stock", steps: ["Verify real-time inventory via POS integration or contact the restaurant.","Mark the item unavailable on the menu immediately when confirmed.","Offer alternatives or refund to the customer if necessary.","Provide guidance to the restaurant on inventory settings."] },
+      
+        9: { title: "Inquiry about automatic refunds by Keeta", steps: ["Check the refund logs for the order ID and reason code.","If a refund was executed, provide merchant with transaction ID and timestamp.","If the refund was incorrect, open a remediation ticket to Finance with AUTO-REFUND-REV reference.","Confirm remediation and close the ticket."] }
+      }
+    };
+
+    const mainNon = document.getElementById('main-non');
+    const mainOrder = document.getElementById('main-order');
+    const mainScripts = document.getElementById('main-scripts');
+    const mainIconsContainer = document.querySelector('.main-icons');
+    const overlay = document.getElementById('drawerOverlay');
+
+    const detailDrawer = document.getElementById('detailDrawer');
+    const drawerTitle = document.getElementById('drawerTitle');
+    const drawerSub = document.getElementById('drawerSub');
+    const drawerBody = document.getElementById('drawerBody');
+    const drawerActions = document.getElementById('drawerActions');
+    const closeDrawer = document.getElementById('closeDrawer');
+
+    const subBackBtn = document.getElementById('subBackBtn');
+    const contentWrap = document.querySelector('.content-wrap');
+
+    let drawerSentinelStart = null;
+    let drawerSentinelEnd = null;
+    let subSentinelStart = null;
+    let subSentinelEnd = null;
+
+    function getFocusable(container) {
+      if(!container) return [];
+      return Array.from(container.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'))
+        .filter(el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length));
+    }
+
+    function safeFocus(el){
+      try{ if(el && typeof el.focus === 'function') el.focus(); }catch(e){}
+    }
+
+    let drawerDblHandler = null;
+    function enableDblCopyInDrawer() {
+      disableDblCopyInDrawer();
+      drawerDblHandler = function(e){
+        const el = e.target.closest('.plain-solution h2, .plain-solution p, .plain-solution li, .plain-solution .preserve, .plain-solution');
+        if(!el) return;
+        const textToCopy = el.textContent.trim();
+        if(!textToCopy) return;
+        if(navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy).then(()=> showNotice('Copied','info')).catch(()=> fallbackCopy(textToCopy));
+        } else fallbackCopy(textToCopy);
+      };
+      if (drawerBody) drawerBody.addEventListener('dblclick', drawerDblHandler);
+    }
+    function disableDblCopyInDrawer() {
+      if(drawerDblHandler) {
+        if (drawerBody) drawerBody.removeEventListener('dblclick', drawerDblHandler);
+        drawerDblHandler = null;
+      }
+    }
+
+    function fallbackCopy(t){
+      try{
+        const ta=document.createElement('textarea');
+        ta.value=t;
+        ta.style.position='absolute';
+        ta.style.left='-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showNotice('Copied','info');
+      } catch(e) { showNotice('Copy not available','error'); }
+    }
+    function clearNotice(){ const n=document.getElementById('translationNotice'); if(n) n.remove(); }
+    function showNotice(text, type='info'){
+      clearNotice();
+      if(!text) return;
+      const n = document.createElement('div'); n.id='translationNotice'; n.className='notice '+(type==='error'?'error':'info'); n.textContent=text;
+      if (drawerBody && drawerBody.parentNode) drawerBody.parentNode.insertBefore(n, drawerBody);
+      setTimeout(()=> { if(n) n.remove(); }, 1200);
+    }
+
+    function sortByWordCountAsc(arr){
+      return arr.slice().sort((a,b)=>{
+        const wa = a.label ? a.label.trim().split(/\s+/).length : 0;
+        const wb = b.label ? b.label.trim().split(/\s+/).length : 0;
+        if(wa === wb) return (a.label || '').localeCompare(b.label || '');
+        return wa - wb;
+      });
+    }
+
+    let subPanel = null;
+    let _mainIconsHideTimeout = null;
+
+    function createSubPanel(items, opts = {}) {
+      const sorted = sortByWordCountAsc(items);
+
+      if(subPanel && subPanel.parentNode) subPanel.parentNode.removeChild(subPanel);
+      subPanel = document.createElement('div');
+      subPanel.id = 'subPanel';
+      subPanel.className = 'sub-panel';
+      subPanel.setAttribute('role','list');
+      subPanel.setAttribute('aria-label', opts.label || 'Sub items');
+      subPanel.style.position = 'fixed';
+
+      const itemWidth = 160;
+      const gap = 18;
+      const maxAvailable = Math.min(1100, window.innerWidth - 80);
+      const cols = Math.max(1, Math.min(sorted.length, Math.floor((maxAvailable + gap) / (itemWidth + gap))));
+      const gridWidth = cols * itemWidth + (cols - 1) * gap;
+      subPanel.style.width = `${Math.min(gridWidth, maxAvailable)}px`;
+      subPanel.style.gridTemplateColumns = `repeat(${cols}, ${itemWidth}px)`;
+
+      const totalRows = Math.ceil(sorted.length / cols);
+      const viewportH = window.innerHeight;
+      let initialTy = Math.max(24, Math.round(viewportH * 0.06));
+      if(window.innerWidth < 760) initialTy = Math.max(18, Math.round(viewportH * 0.05));
+
+      sorted.forEach((item, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'sub-item';
+        btn.type = 'button';
+        btn.setAttribute('aria-label', item.label);
+        btn.setAttribute('role','listitem');
+
+        const iconDiv = document.createElement('div'); iconDiv.className = 'icon';
+        const kb = document.createElement('div'); kb.className = 'kb'; kb.textContent = 'KB';
+        iconDiv.appendChild(kb);
+
+        const label = document.createElement('div'); label.className = 'sub-label'; label.textContent = item.label;
+        btn.appendChild(iconDiv);
+        btn.appendChild(label);
+
+        btn.addEventListener('click', () => openDetailDrawer(opts.cat || 'non', item.id, item.label));
+
+        const row = Math.floor(i / cols);
+        const invertedRow = (totalRows - 1) - row;
+        const col = i % cols;
+        const delay = (invertedRow * 70) + (col * 18);
+        btn.style.transitionDelay = `${delay}ms`;
+
+        btn.style.setProperty('--ty', `${initialTy}px`);
+        btn.style.setProperty('--tx', '0px');
+
+        subPanel.appendChild(btn);
+      });
+
+      document.body.appendChild(subPanel);
+
+      if (!subSentinelStart) {
+        subSentinelStart = document.createElement('div');
+        subSentinelStart.tabIndex = 0;
+        subSentinelStart.style.position = 'absolute';
+        subSentinelStart.style.left = '-9999px';
+        document.body.appendChild(subSentinelStart);
+        subSentinelStart.addEventListener('focus', () => {
+          const focusables = getFocusable(subPanel);
+          if (focusables.length) focusables[focusables.length - 1].focus();
+        });
+      }
+      if (!subSentinelEnd) {
+        subSentinelEnd = document.createElement('div');
+        subSentinelEnd.tabIndex = 0;
+        subSentinelEnd.style.position = 'absolute';
+        subSentinelEnd.style.left = '-9999px';
+        document.body.appendChild(subSentinelEnd);
+        subSentinelEnd.addEventListener('focus', () => {
+          const focusables = getFocusable(subPanel);
+          if (focusables.length) focusables[0].focus();
+        });
+      }
+
+      if (subBackBtn) {
+        subBackBtn.style.display = 'block';
+        subBackBtn.setAttribute('aria-hidden', 'false');
+        subBackBtn.onclick = removeSubPanel;
+      }
+
+      requestAnimationFrame(() => {
+        subPanel.classList.add('show');
+        const itemsEls = Array.from(subPanel.querySelectorAll('.sub-item'));
+        itemsEls.forEach((el, idx) => setTimeout(()=> el.classList.add('show'), 6 + (idx * 6)));
+      });
+
+      if (overlay) {
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden','false');
+      }
+
+      collapseMainIcons();
+
+      const mainBtn = (opts.cat === 'order') ? mainOrder : (opts.cat === 'non') ? mainNon : mainScripts;
+      if (mainBtn) {
+        [mainNon, mainOrder, mainScripts].forEach(b => {
+          if (!b) return;
+          b.setAttribute('aria-selected', b === mainBtn ? 'true' : 'false');
+          b.setAttribute('aria-expanded', b === mainBtn ? 'true' : 'false');
+        });
+      }
+
+      if(contentWrap) {
+        try { contentWrap.inert = true; } catch(e) { contentWrap.setAttribute('inert',''); }
+      }
+
+      const focusables = getFocusable(subPanel);
+      if(focusables.length) safeFocus(focusables[0]);
+    }
+
+    function removeSubPanel() {
+      if(!subPanel) return;
+      const itemsEls = Array.from(subPanel.querySelectorAll('.sub-item'));
+      itemsEls.forEach((el,i) => {
+        el.style.transitionDelay = `${i * 12}ms`;
+        el.classList.remove('show');
+      });
+      subPanel.classList.remove('show');
+
+      if (subBackBtn) {
+        subBackBtn.style.display = 'none';
+        subBackBtn.setAttribute('aria-hidden', 'true');
+      }
+
+      if(!detailDrawer.classList.contains('open')) {
+        if (overlay) {
+          overlay.classList.remove('open');
+          overlay.setAttribute('aria-hidden','true');
+        }
+      }
+
+      setTimeout(()=>{
+        if(subPanel && subPanel.parentNode) subPanel.parentNode.removeChild(subPanel);
+        subPanel = null;
+      }, 300 + (itemsEls.length * 12));
+
+      restoreMainIcons();
+
+      if(contentWrap) {
+        try { contentWrap.inert = false; } catch(e) { contentWrap.removeAttribute('inert'); }
+        contentWrap.removeAttribute('aria-hidden');
+      }
+
+      [mainNon, mainOrder, mainScripts].forEach(btn => {
+        if (!btn) return;
+        btn.setAttribute('aria-expanded','false');
+        btn.setAttribute('aria-selected','false');
+      });
+
+      if (subSentinelStart) { subSentinelStart.remove(); subSentinelStart = null; }
+      if (subSentinelEnd) { subSentinelEnd.remove(); subSentinelEnd = null; }
+    }
+
+    function collapseMainIcons() {
+      if(!mainIconsContainer) return;
+      if (_mainIconsHideTimeout) { clearTimeout(_mainIconsHideTimeout); _mainIconsHideTimeout = null; }
+
+      mainIconsContainer.classList.add('collapsing');
+      mainIconsContainer.setAttribute('aria-hidden', 'true');
+      const mains = Array.from(mainIconsContainer.querySelectorAll('.main-icon'));
+      mains.forEach((el,i) => {
+        el.setAttribute('disabled', 'true');
+        el.dataset._origTransitionDelay = el.style.transitionDelay || '';
+        el.style.transitionDelay = `${i * 40}ms`;
+      });
+      const totalDelay = 260 + (mains.length * 40);
+
+      _mainIconsHideTimeout = setTimeout(()=> {
+        if(mainIconsContainer) mainIconsContainer.style.display = 'none';
+        _mainIconsHideTimeout = null;
+      }, totalDelay);
+    }
+    function restoreMainIcons() {
+      if(!mainIconsContainer) return;
+      if (_mainIconsHideTimeout) { clearTimeout(_mainIconsHideTimeout); _mainIconsHideTimeout = null; }
+
+      mainIconsContainer.style.display = '';
+      mainIconsContainer.removeAttribute('aria-hidden');
+
+      const mains = Array.from(mainIconsContainer.querySelectorAll('.main-icon'));
+      mains.forEach((el) => {
+        el.removeAttribute('disabled');
+        if (el.dataset && typeof el.dataset._origTransitionDelay !== 'undefined') {
+          el.style.transitionDelay = el.dataset._origTransitionDelay || '';
+          delete el.dataset._origTransitionDelay;
+        } else {
+          el.style.transitionDelay = '';
+        }
+      });
+
+      void mainIconsContainer.offsetWidth;
+      setTimeout(()=> mainIconsContainer.classList.remove('collapsing'), 12);
+    }
+
+    function moveSubPanelLeftOfDrawer() {
+      if(!subPanel) return;
+      if(!detailDrawer) return;
+      const drawerRect = detailDrawer.getBoundingClientRect();
+      const subRect = subPanel.getBoundingClientRect();
+      const margin = 22;
+      const desiredRight = drawerRect.left - margin;
+      const desiredCenterX = desiredRight - (subRect.width / 2);
+      const currentCenterX = window.innerWidth / 2;
+      let shift = Math.max(0, currentCenterX - desiredCenterX);
+      subPanel.style.transition = `transform var(--motion-duration) var(--motion-ease)`;
+      subPanel.style.transform = `translate(calc(-50% - ${shift}px), -50%)`;
+      subPanel.style.opacity = '0.98';
+    }
+    function resetSubPanelPosition() {
+      if(!subPanel) return;
+      subPanel.style.transition = `transform var(--motion-duration) var(--motion-ease)`;
+      subPanel.style.transform = `translate(-50%,-50%)`;
+      subPanel.style.opacity = '1';
+    }
+
+    let lastFocusedBeforeDrawer = null;
+
+    function addDrawerSentinels() {
+      if (drawerSentinelStart || drawerSentinelEnd) return;
+      if (!detailDrawer) return;
+      drawerSentinelStart = document.createElement('div');
+      drawerSentinelStart.tabIndex = 0;
+      drawerSentinelStart.style.position = 'absolute';
+      drawerSentinelStart.style.left = '-9999px';
+      detailDrawer.insertBefore(drawerSentinelStart, detailDrawer.firstChild);
+      drawerSentinelStart.addEventListener('focus', () => {
+        const focusables = getFocusable(detailDrawer);
+        if (focusables.length) focusables[focusables.length - 1].focus();
+      });
+
+      drawerSentinelEnd = document.createElement('div');
+      drawerSentinelEnd.tabIndex = 0;
+      drawerSentinelEnd.style.position = 'absolute';
+      drawerSentinelEnd.style.left = '-9999px';
+      detailDrawer.appendChild(drawerSentinelEnd);
+      drawerSentinelEnd.addEventListener('focus', () => {
+        const focusables = getFocusable(detailDrawer);
+        if (focusables.length) focusables[0].focus();
+      });
+    }
+
+    function removeDrawerSentinels() {
+      if (drawerSentinelStart) { drawerSentinelStart.remove(); drawerSentinelStart = null; }
+      if (drawerSentinelEnd) { drawerSentinelEnd.remove(); drawerSentinelEnd = null; }
+    }
+
+    function openDetailDrawer(cat, id, title){
+      if (!drawerTitle || !drawerSub || !drawerBody || !detailDrawer) return;
+      drawerTitle.textContent = title;
+      drawerSub.textContent = (cat === 'order') ? 'Order Issues' : (cat === 'non') ? 'Non-order issue' : 'Scripts';
+      drawerBody.innerHTML = ''; drawerActions.innerHTML = ''; clearNotice();
+
+      const data = (approvedSteps[cat] && approvedSteps[cat][id]) ? approvedSteps[cat][id] : null;
+
+      const article = document.createElement('article');
+      article.className = 'plain-solution';
+      const h2 = document.createElement('h2');
+      h2.textContent = data ? data.title : title;
+      article.appendChild(h2);
+
+      if (data && data.contentBlocks && Array.isArray(data.contentBlocks)) {
+        data.contentBlocks.forEach(block => {
+          if (typeof block.text === 'undefined' || block.text === null) return;
+          if (block.text === "") {
+            const br = document.createElement('div');
+            br.className = 'preserve';
+            br.textContent = '';
+            article.appendChild(br);
+            return;
+          }
+
+          if (block.bold) {
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'preserve';
+            labelDiv.setAttribute('dir', block.dir || 'ltr');
+            if (block.dir === 'rtl') labelDiv.setAttribute('lang','ar');
+            const strong = document.createElement('strong');
+            strong.textContent = block.text;
+            labelDiv.appendChild(strong);
+            article.appendChild(labelDiv);
+            return;
+          }
+
+          const preDiv = document.createElement('div');
+          preDiv.className = 'preserve';
+          preDiv.setAttribute('dir', block.dir || 'ltr');
+          if (block.dir === 'rtl') preDiv.setAttribute('lang','ar');
+          preDiv.textContent = block.text;
+          article.appendChild(preDiv);
+        });
+      } else if (!data) {
+        const p = document.createElement('p'); p.textContent = 'This item has no defined approved procedure. Please contact operations.'; article.appendChild(p);
+      } else {
+        const ol = document.createElement('ol');
+        if (data.steps && Array.isArray(data.steps)) {
+          data.steps.forEach((s)=> {
+            const li = document.createElement('li'); li.textContent = s; ol.appendChild(li);
+          });
+        }
+        article.appendChild(ol);
+      }
+
+      drawerBody.appendChild(article);
+
+      if(!detailDrawer.classList.contains('open')) lastFocusedBeforeDrawer = document.activeElement;
+      detailDrawer.classList.add('open'); detailDrawer.setAttribute('aria-hidden','false');
+      detailDrawer.setAttribute('aria-modal','true');
+      document.body.classList.add('drawer-open');
+      if (overlay) { overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); }
+
+      addDrawerSentinels();
+      enableDblCopyInDrawer();
+
+      if(contentWrap) {
+        try { contentWrap.inert = true; } catch(e) { contentWrap.setAttribute('inert',''); }
+      }
+
+      if(subPanel) {
+        setTimeout(()=> moveSubPanelLeftOfDrawer(), 180);
+      }
+
+      setTimeout(()=> {
+        const first = detailDrawer.querySelector('button:not([disabled]), [href], input, textarea, [tabindex]:not([tabindex="-1"])');
+        if(first) safeFocus(first); else safeFocus(drawerBody);
+      }, 160);
+    }
+
+    function closeDetailDrawer(){
+      if (!detailDrawer) return;
+      detailDrawer.classList.remove('open');
+      detailDrawer.setAttribute('aria-hidden','true');
+      detailDrawer.removeAttribute('aria-modal');
+      clearNotice();
+      document.body.classList.remove('drawer-open');
+
+      disableDblCopyInDrawer();
+
+      try{ if(lastFocusedBeforeDrawer && typeof lastFocusedBeforeDrawer.focus === 'function') lastFocusedBeforeDrawer.focus(); }catch(e){} lastFocusedBeforeDrawer=null;
+
+      if(subPanel) resetSubPanelPosition();
+      else {
+        if (overlay) {
+          overlay.classList.remove('open');
+          overlay.setAttribute('aria-hidden','true');
+        }
+      }
+
+      removeDrawerSentinels();
+
+      if(contentWrap) {
+        try { contentWrap.inert = false; } catch(e) { contentWrap.removeAttribute('inert'); }
+        contentWrap.removeAttribute('aria-hidden');
+      }
+    }
+
+    function openScriptsDirect() {
+      if (!drawerTitle || !drawerSub || !drawerBody || !detailDrawer) return;
+      drawerTitle.textContent = 'Scripts';
+      drawerSub.textContent = 'Scripts — Templates';
+      drawerBody.innerHTML = '';
+      drawerActions.innerHTML = '';
+
+      if(!detailDrawer.classList.contains('open')) lastFocusedBeforeDrawer = document.activeElement;
+      detailDrawer.classList.add('open'); detailDrawer.setAttribute('aria-hidden','false');
+      detailDrawer.setAttribute('aria-modal','true');
+      document.body.classList.add('drawer-open');
+      if (overlay) { overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); }
+
+      addDrawerSentinels();
+      enableDblCopyInDrawer();
+
+      if(subPanel) setTimeout(()=> moveSubPanelLeftOfDrawer(), 180);
+
+      if(contentWrap) {
+        try { contentWrap.inert = true; } catch(e) { contentWrap.setAttribute('inert',''); }
+      }
+
+      setTimeout(()=> {
+        const first = detailDrawer.querySelector('button:not([disabled]), [href], input, textarea, [tabindex]:not([tabindex="-1"])');
+        if(first) safeFocus(first); else safeFocus(drawerBody);
+      }, 160);
+    }
+
+    if (mainNon) mainNon.addEventListener('click', ()=> { createSubPanel(nonOrderItems, {cat:'non', label:'Non-order items'}); });
+    if (mainOrder) mainOrder.addEventListener('click', ()=> { createSubPanel(orderItems, {cat:'order', label:'Order items'}); });
+    if (mainScripts) mainScripts.addEventListener('click', ()=> openScriptsDirect());
+
+    if (subBackBtn) subBackBtn.addEventListener('click', removeSubPanel);
+
+    if (overlay) {
+      overlay.addEventListener('click', () => {
+        if(subPanel) removeSubPanel();
+        else if(detailDrawer && detailDrawer.classList.contains('open')) closeDetailDrawer();
+        else { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); }
+      });
+    }
+
+    if (closeDrawer) closeDrawer.addEventListener('click', ()=> closeDetailDrawer());
+
+    document.addEventListener('click', (e) => {
+      if(!detailDrawer || !detailDrawer.classList.contains('open')) return;
+      const clickInsideDrawer = !!e.target.closest('#detailDrawer');
+      const clickInsideSubPanel = !!e.target.closest('.sub-panel');
+      const clickInsideMainIcons = !!e.target.closest('.main-icons');
+      const clickOnOverlay = !!e.target.closest('#drawerOverlay');
+      if(!clickInsideDrawer && !clickInsideSubPanel && !clickInsideMainIcons && !clickOnOverlay) {
+        closeDetailDrawer();
+      }
+    }, true);
+
+    document.addEventListener('keydown', (e)=>{
+      if(detailDrawer && detailDrawer.classList.contains('open')) {
+        if(e.key === 'Escape') { e.preventDefault(); closeDetailDrawer(); return; }
+        if(e.key === 'Tab') {
+          const focusables = getFocusable(detailDrawer);
+          if(focusables.length === 0) { e.preventDefault(); safeFocus(drawerBody); return; }
+          const first = focusables[0], last = focusables[focusables.length -1];
+          if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+          else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+        }
+      } else if(subPanel) {
+        if(e.key === 'Escape') { e.preventDefault(); removeSubPanel(); return; }
+        if(e.key === 'Tab') {
+          const focusables = getFocusable(subPanel);
+          if(focusables.length === 0) { e.preventDefault(); safeFocus(subPanel); return; }
+          const first = focusables[0], last = focusables[focusables.length -1];
+          if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+          else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+        }
+      }
+    }, true);
+
+    [mainNon, mainOrder, mainScripts].forEach(btn=>{
+      if (!btn) return;
+      btn.addEventListener('keydown', (e)=> { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }});
+    });
+
+    let resizeTimeout = null;
+    window.addEventListener('resize', () => {
+      if(!subPanel) return;
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(()=> {
+        const itemWidth = 160;
+        const gap = 18;
+        const maxAvailable = Math.min(1100, window.innerWidth - 80);
+        const count = subPanel.querySelectorAll('.sub-item').length;
+        const cols = Math.max(1, Math.min(count, Math.floor((maxAvailable + gap) / (itemWidth + gap))));
+        const gridWidth = cols * itemWidth + (cols - 1) * gap;
+        subPanel.style.width = `${Math.min(gridWidth, maxAvailable)}px`;
+        subPanel.style.gridTemplateColumns = `repeat(${cols}, ${itemWidth}px)`;
+      }, 180);
+    });
+
+    window.addEventListener('beforeunload', ()=> { disableDblCopyInDrawer(); });
+  </script>
+</body>
+</html>

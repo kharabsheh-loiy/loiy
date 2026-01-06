@@ -361,24 +361,23 @@
 
     const approvedSteps = {
       non: {
-        1: { title: "Account registration", steps: ["Verify the user's identity with required official documents according to onboarding policy.","Confirm contact details (phone/email) and ownership.","If documents are missing, notify the merchant with exact missing items and a deadline.","Complete registration and send automated confirmation using template REG-OK-01."] },
-        2: { title: "Account deletion", steps: ["Confirm deletion request originates from the verified account owner.","Check for outstanding settlements; if present, escalate to Finance with a reference.","Apply data retention and deletion rules, and record a deletion token.","Notify the merchant using standard deletion confirmation template."] },
-         3: {
-          title: "Qualification materials for restaurant onboarding",
+        
+         1 : {
+          title: "Account registration",
           contentBlocks: [
-            { bold: true, dir: "ltr", text: "-BD non-compliant behaviours" },
+            { bold: true, dir: "ltr", text: "-Account registration" },
             { text: "" },
             { bold: true, dir: "rtl", text: "- خطوات الحل" },
             { text: "" },
-            { dir: "rtl", text: "1- افهم المشكلة من التاجر بشكل صحيح واطلب دليل اذا توفر\n2- تصعيد المشكلة للقسم المختص" },
+            { dir: "rtl", text: "1- توجيه التاجر للتقديم بنفسه عبر صفحة الانضمام الرسمية الخاصة ب\n- في حال رفض التاجر أو طلب مساعدة من خدمة العملاء، يتم تصعيد الحالة" },
             { text: "" },
             { bold: true, dir: "ltr", text: "KB - Script" },
             { text: "" },
             { bold: true, dir: "ltr", text: "- EN" },
-            { dir: "ltr", text: "I`m sorry for the bad experience. Your feedback have been recorded and we attach great importance to it.We will verify it as soon as possible, and if it is true, we will punish the business manager accordingly. In order to avoid such problems from happening again, we will also increase the monitoring of business managers to improve service quality, and hope that you will continue to supervise.thank you for your support and understanding." },
+            { dir: "ltr", text: "Hello, thank you for your support of Keeta. Please visit the following webpage and submit the merchant cooperation application. A sales manager will contact you after submission" },
             { text: "" },
             { bold: true, dir: "rtl", text: "- AR" },
-            { dir: "rtl", text: "أعتذر عن التجربة السيئة اللي مرّيت فيها. ملاحظاتك تم تسجيلها ونحن نوليها أهمية كبيرة. راح نتحقق منها بأسرع وقت، وإذا كانت صحيحة، راح يتم معاقبة مدير الأعمال حسب الإجراءات المتبعة.\nعشان نتجنب حدوث مثل هالمشاكل مرة ثانية، رح نزود المراقبة على مدراء الأعمال لتحسين جودة الخدمة، ونأمل إنك تواصل متابعة الموضوع معنا.\nشكراً لدعمك وتفهمك." },
+            { dir: "rtl", text: "مرحبًا، شكرًا لدعمك لمنصة كيتا.\nيرجى زيارة الرابط التالي وتعبئة نموذج الانضمام، وسيقوم مدير المبيعات بالتواصل معك بعد تقديم الطلب."},
             { text: "" },
             { bold: true, dir: "ltr", text: "- EscalationTemplate" },
             { text: "" },
@@ -387,13 +386,73 @@
             { bold: true, dir: "ltr", text: "- More Scripts" },
             { text: "" },
             { bold: true, dir: "ltr", text: "- EN" },
-            { dir: "ltr", text: "First of all, I’m really sorry for the experience you’ve had, and I completely understand the frustration you must be feeling. Your feedback has been received, and we take it very seriously.\nWe are currently looking into the issue as quickly as possible, and if it's confirmed, we will take the necessary steps with the business manager following our procedures.\nTo prevent similar issues in the future, we’ll be increasing the monitoring of business managers and working on improving our service overall.\nI really appreciate your patience and cooperation with us. If you need anything else or want to follow up, I’m always here to help.\nThanks again for your understanding and continued support!" },
+            { dir: "ltr", text: "Thanks a lot for your interest in joining Keeta You can easily apply by filling out the form through the official Keeta link, and our sales team will contact you directly." },
             { text: "" },
             { bold: true, dir: "rtl", text: "- AR" },
-            { dir: "rtl", text: "أول شي، أنا متأسف جداً عالتجربة اللي مرّيت فيها، وأقدر تماماً الإحباط اللي حسيت فيه. ملاحظتك وصلت إلينا، وحطيناها ضمن أولوياتنا.\nحاليّاً، عم نتحقق من الموضوع بأسرع وقت، وإذا كان الكلام صحيح، رح نتخذ الإجراءات اللازمة مع مدير الأعمال حسب القوانين اللي عندنا.\nولحتى نتجنب تكرار هالمشاكل مستقبلاً، رح نزيد المراقبة على مدراء الأعمال ونشتغل على تحسين الخدمة بشكل عام.\nأنا متفهم تماماً وكتير نقدر صبرك وتعاونك معنا. إذا في شي تاني حابب تستفسر عنه أو تتابع الموضوع، أنا هون دائماً لأساعدك.\nشكراً كتير لتفهمك ودعمك المستمر!" }
-          ]
-        
-      },
+            { dir: "rtl", text:"يعطيك العافية، ونشكر اهتمامك بالانضمام لكيتا تقدر بكل سهولة تعبّي نموذج الانضمام من خلال الرابط الرسمي، وراح يتواصل معك مدير الاعمال باقرب وقت ممكن  ." },
+         ]},
+        2: {
+          title: "Account deletion",
+          contentBlocks: [
+            { bold: true, dir: "ltr", text: "Account deletion" },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- خطوات الحل" },
+            { text: "" },
+            { dir: "rtl", text: "1- استلام طلب التاجر ومحاولة التهدئة \n 2- تصعيد الطلب إلى القسم المختص \n3- انتظار تواصل مدير الأعمال مع التاجر خلال 1–2 يوم عمل " },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "KB - Script" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EN" },
+            { dir: "ltr", text: "We have forwarded your store delisting or termination request to your business manager. Please allow 1–2 business days for them to contact you. Thank you for your patience! " },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- AR" },
+            { dir: "rtl", text: " لقد قمنا بتحويل طلبك لإلغاء أو إنهاء المتجر إلى مدير الأعمال. يرجى السماح من 1 إلى 2 يوم عمل ليتم التواصل معك. شكرًا لصبرك!"},
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EscalationTemplate" },
+            { text: "" },
+            { dir: "ltr", text: "Feedback time:\nCase ID:\nStore ID:\nStore Name:\nStore Address:\nStore Contact Information:966-\nThe brand manager:\nFull Description :" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- More Scripts" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EN" },
+            { dir: "ltr", text: "I understand your request and I’m really sorry for any inconvenience this situation may have caused you. " },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- AR" },
+            { dir: "rtl", text:" تم رفع طلب إلغاء أو إنهاء المتجر لمدير الأعمال المسؤول، وإن شاء الله راح يتواصل معك خلال يوم إلى يومين عمل عشان يساعدك ويكمل معك الإجراءات" },
+         ]
+        },
+          9: {
+          title: "Material purchase",
+          contentBlocks: [
+            { bold: true, dir: "ltr", text: "-Account registration" },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- خطوات الحل" },
+            { text: "" },
+            { dir: "rtl", text: "1-استلام طلب التاجر  \n 2- تصعيد الطلب إلى القسم المختص" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "KB - Script" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EN" },
+            { dir: "ltr", text: "Hello, I will provide feedback to the business manager regarding your situation. The business manager will address your issue within one week. Please be patient, and thank you for your cooperation. " },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- AR" },
+            { dir: "rtl", text: " راح أبلغ مدير الأعمال عن ملاحظاتك، وراح يتم التعامل مع طلبك خلال أسبوع. نرجو منك الصبر، وشكرًا لتعاونك."},
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EscalationTemplate" },
+            { text: "" },
+            { dir: "ltr", text: "Feedback time:\nCase ID:\nStore ID:\nStore Name:\nStore Address:\nStore Contact Information:966-\nThe brand manager:\nFull Description :" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- More Scripts" },
+            { text: "" },
+            { bold: true, dir: "ltr", text: "- EN" },
+            { dir: "ltr", text: "I’ve shared your request with the merchant operations team, and the business manager will take care of it within a week. and thank you for your patience " },
+            { text: "" },
+            { bold: true, dir: "rtl", text: "- AR" },
+            { dir: "rtl", text:" تم رفع طلبك لفريق تشغيل التجار، وإن شاء الله مدير الأعمال راح يتابع الموضوع ويتعامل معه خلال أسبوع. ونشكرك على صبرك" },
+
+        ]},
+
+
         16: {
           title: "BD non-compliant behaviours",
           contentBlocks: [
